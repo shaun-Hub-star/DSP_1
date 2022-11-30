@@ -18,15 +18,19 @@ public interface IS3_Methods {
     /**
      * @param key fileId
      * */
-    File downloadFile(String key);
+    File downloadFile(String key, String downloadTo);
 
     /**
      * @param key fileId
      * */
     void deleteFile(String key);
 
-    void createBucket();
+    boolean createBucket();
 
-    void deleteBucket();
+    void deleteBucketAndContent();
+
+    boolean doesBucketExist();
+
+    String downloadFileContentFromS3(String fileNameInS3, String fileType, String outputFileDir);
 
 }

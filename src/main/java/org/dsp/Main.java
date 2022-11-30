@@ -3,6 +3,8 @@ package org.dsp;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.dsp.S3_service.S3Instance;
+import software.amazon.awssdk.regions.Region;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,7 +16,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        String links_path = "src/main/resources/image_links.txt";
+        /*String links_path = "src/main/resources/image_links.txt";
         List<String> images_link_ = parseImagesLinks(links_path);
         List<String> images_link = new ArrayList<>(
                 new HashSet<>(images_link_));
@@ -22,7 +24,17 @@ public class Main {
         for (String imgLink : images_link) {
             imgLinkOCRs.add(new Pair<>(imgLink, doOCR(downloadImage(imgLink))));
         }
-        createHTML(createHtmlBody(imgLinkOCRs), "src/main/resources/Output");
+        createHTML(createHtmlBody(imgLinkOCRs), "src/main/resources/Output");*/
+
+        String suffix = "0525381648dqw4w9wgxcq";
+        String jarsBucket = "jars" + suffix;
+        Region region = Region.US_EAST_1;
+        S3Instance s3Jars = new S3Instance(region, jarsBucket);
+        s3Jars.createBucket();
+        String managerJarKey = "ManagerJar";
+        String managerJarPath = "/home/spl-labs/Desktop/DSP_213/out/artifacts/DSP_213_jar/DSP_213.jar";
+        s3Jars.uploadFile(managerJarKey, managerJarPath);
+
 
     }
 
@@ -41,7 +53,7 @@ public class Main {
     }
 
     private static Pair<String, String> getLinkNameAndFormat(String linkName) {
-        var split = linkName.split("/");
+        String[] split = linkName.split("/");
         String name = split[split.length - 1];
         return new Pair<>(name /*name*/, name.split("\\.")[1] /*format*/);//if the time allows to do format checking because the ocr supports certain formats
     }
@@ -75,34 +87,8 @@ public class Main {
 
     }
 
-    private static String createHtmlBody(List<Pair<String, String>> imgLinkOCRs) {
-        StringBuilder body = new StringBuilder();
-        for (Pair<String, String> img : imgLinkOCRs) {
-            body.append("<p>\n\t<img src=\"")
-                    .append(img.getFirst())
-                    .append("\"><br>\n\t")
-                    .append(img.getSecond())
-                    .append("\n</p>\n");
-        }
-        return body.toString();
-    }
 
-    private static void createHTML(String htmlBody, String dirPath) {
-        String html =
-                """
-                        <html>
-                        <head>
-                            <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-                            <title>OCR</title>
-                        </head>
-                        """ + htmlBody + "</html>";
 
-        try (FileWriter fw = new FileWriter(dirPath + "\\results.html")) {
-            fw.write(html);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
