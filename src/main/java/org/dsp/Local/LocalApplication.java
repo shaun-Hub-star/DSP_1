@@ -1,17 +1,15 @@
 package org.dsp.Local;
 
-import org.dsp.EC2_service.EC2_Service;
-import org.dsp.S3_service.S3Instance;
-import org.dsp.SQS_service.SQSQueue;
+import org.dsp.AWS_SERVICES.EC2_service.EC2_Service;
+import org.dsp.AWS_SERVICES.S3_service.S3Instance;
+import org.dsp.AWS_SERVICES.SQS_service.SQSQueue;
 import org.dsp.messages.SQSMessage;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
-import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
-import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 
 import java.io.*;
 
-public class LocalApplication implements Runnable {
+public class LocalApplication {
 
 
     private final String suffix = "0525381648dqw4w9wgxcq";
@@ -33,6 +31,8 @@ public class LocalApplication implements Runnable {
     private final SQSQueue resultFromManager = new SQSQueue(s3Instance.getBucket(), this.region);
     private final int ratioOfComputers;
 
+    private final String terminationCode = "terminate";
+
     public LocalApplication(String inputFilePath, String outputFilePath, int ratioOfComputers) {
         this.inputFilePath = inputFilePath;
         this.inputFileName = getNameOfTheFile(inputFilePath);
@@ -48,14 +48,14 @@ public class LocalApplication implements Runnable {
             //the manager does not exist
             String managerScript =
                     "#!/bin/bash\n" +
-                            //"sudo yum update -y\n" +
-                            //"sudo amazon-linux-extras install java-openjdk19 -y\n" +
-                            //"sudo yum install java-devel -y\n" +
+                            "sudo yum update -y\n" +
+                            "sudo amazon-linux-extras install java-openjdk11 -y\n" +
+                            "sudo yum install java-devel -y\n" +
                             "mkdir ManagerFiles\n" +
                             "cd ManagerFiles\n" +
                             "aws s3 cp s3://" + s3Jars.getBucket() + "/" + this.managerJarKey + " " + this.managerJarKey + ".jar\n" +
                             "java -jar " + this.managerJarKey + ".jar " +
-                            /*args:*/suffix + " " + managerExistsBucketName + " " + managerExistsFileKey + " " + ratioOfComputers ;
+                            /*args:*/suffix + " " + managerExistsBucketName + " " + managerExistsFileKey + " " + ratioOfComputers + " " + terminationCode;
 
             this.managerId = ec2_service.createEc2Instance(managerTag, managerScript, InstanceType.M4_LARGE);
             createAndUploadManagerFile();
@@ -110,7 +110,7 @@ public class LocalApplication implements Runnable {
         File file = new File(txtFileName);
         s3ManagerBucket.uploadFile(this.managerExistsFileKey, file);
         if (!file.delete()) {
-            System.out.println("Fail: failed to delete managerExistFile locally");
+            System.out.println("[DEBUG]: Fail: failed to delete managerExistFile locally");
         }
     }
 
@@ -135,7 +135,7 @@ public class LocalApplication implements Runnable {
     }
 
     private void sendTerminationMessageToManager() {
-        localToManagerSQS.sendMessage(new SQSMessage("terminate", s3Instance.getBucket()/*client id*/));
+        localToManagerSQS.sendMessage(new SQSMessage(terminationCode, s3Instance.getBucket()/*client id*/));
     }
 
     private void deleteManagerExistsBucket() {
@@ -185,27 +185,35 @@ public class LocalApplication implements Runnable {
 
 
 
-    @Override
     public void run() {
         try{
-            //uploadImageURLsToS3();
+            uploadImageURLsToS3();
             startManager();
 
             sendTheLocationOfInputFileOnS3ForManager();
+            /*
             waitForResultFromManager();
             deleteResultSQS();
             //String htmlBody = getHtmlBodyFromS3();
             deleteLocalAppBucket();
             //createHTML(htmlBody);
 
+             */
+
         } catch (Exception e){
+            /*
             deleteResultSQS();
             deleteLocalAppBucket();
-            System.out.println("Error: " + e.getMessage());
+
+             */
+            e.printStackTrace();
         }
         finally {
+            /*
             s3ManagerBucket.deleteBucketAndContent();
             ec2_service.terminateEC2(this.managerId);
+
+             */
         }
 
     }

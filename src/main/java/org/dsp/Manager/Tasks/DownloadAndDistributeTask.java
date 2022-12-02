@@ -1,8 +1,8 @@
 package org.dsp.Manager.Tasks;
 
 import org.dsp.Manager.ResultManager;
-import org.dsp.S3_service.S3Instance;
-import org.dsp.SQS_service.SQSQueue;
+import org.dsp.AWS_SERVICES.S3_service.S3Instance;
+import org.dsp.AWS_SERVICES.SQS_service.SQSQueue;
 import org.dsp.messages.SQSMessage;
 import software.amazon.awssdk.regions.Region;
 
@@ -23,7 +23,8 @@ public class DownloadAndDistributeTask implements Runnable{
     private final ResultManager resultManager;
 
 
-    public DownloadAndDistributeTask(Region region, String bucketNameOfLocalApp, String imgLinksFileKey, SQSQueue managerToWorker, AtomicInteger numberOfMessagesInProcess, ResultManager resultManager) {
+    public DownloadAndDistributeTask(Region region, String bucketNameOfLocalApp, String imgLinksFileKey, SQSQueue managerToWorker,
+                                     AtomicInteger numberOfMessagesInProcess, ResultManager resultManager) {
         this.s3LocalBucket = new S3Instance(region, bucketNameOfLocalApp);
         this.imgLinksFileKey = imgLinksFileKey;
         this.managerToWorker = managerToWorker;
@@ -34,15 +35,16 @@ public class DownloadAndDistributeTask implements Runnable{
     @Override
     public void run() {
         List<SQSMessage> links = new LinkedList<>();
-        File imgLinksFile = s3LocalBucket.downloadFile(imgLinksFileKey, "");
-
+        File imgLinksFile = s3LocalBucket.downloadFile(imgLinksFileKey, imgLinksFileKey + ".txt");
+        System.out.println("[Debug] downloaded file " + imgLinksFileKey + ".txt from s3");
         int numberOfLinks = 0;
+
         try (FileReader fr = new FileReader(imgLinksFile)) {
             BufferedReader br = new BufferedReader(fr);  //creates a buffering character input stream
 
             String imgLink;
             while ((imgLink = br.readLine()) != null) {
-                links.add(new SQSMessage(this.s3LocalBucket.getBucket(), imgLink));
+                links.add(new SQSMessage(imgLink, this.s3LocalBucket.getBucket()));
                 numberOfLinks++;
             }
 
@@ -52,7 +54,11 @@ public class DownloadAndDistributeTask implements Runnable{
 
         boolean ignore = imgLinksFile.delete();
         this.numberOfMessagesInProcess.addAndGet(numberOfLinks);
-        this.numberOfMessagesInProcess.notify(); //FIXME
+        System.out.println("number of messages in progress= " + numberOfMessagesInProcess);
+        synchronized (numberOfMessagesInProcess){
+            this.numberOfMessagesInProcess.notifyAll(); //FIXME
+        }
+
         this.resultManager.addLocalBucketKey(s3LocalBucket.getBucket(), numberOfLinks);
         managerToWorker.sendMultiMsg(links);
 

@@ -1,11 +1,8 @@
 package org.dsp.Manager.Tasks;
 
-import org.dsp.Manager.ResultManager;
-import org.dsp.Manager.Threads.Terminatable;
-import org.dsp.Pair;
-import org.dsp.S3_service.S3Instance;
-import org.dsp.SQS_service.SQSQueue;
-import org.dsp.Worker.WorkerResult;
+import org.dsp.AWS_SERVICES.S3_service.S3Instance;
+import org.dsp.AWS_SERVICES.SQS_service.SQSQueue;
+import org.dsp.Manager.WorkerResult;
 import org.dsp.messages.SQSMessage;
 import software.amazon.awssdk.regions.Region;
 
@@ -40,6 +37,7 @@ public class UploadAndSendTask implements Runnable {
 
         String s3ResultsKey = "results";
         s3LocalBucket.uploadFile(s3ResultsKey, htmlBodyResultFile);
+        System.out.println("[Debug] uploaded result file");
         boolean ignore = htmlBodyResultFile.delete();
 
         managerToLocal.sendMessage(new SQSMessage(s3ResultsKey, s3LocalBucket.getBucket()));

@@ -18,9 +18,9 @@ public class LocalApplicationMain {
         String inputFile = args[0];
         String outputFile = args[1];
         int ratioOfComputers;
-        try{
+        try {
             ratioOfComputers = Integer.parseInt(args[2]);
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
             throw e;
 
@@ -30,10 +30,8 @@ public class LocalApplicationMain {
         localApplication.run();
 
         //at the end:
-        if(args.length == 4)
+        if (args.length == 4 && args[3].equals("terminate"))
             localApplication.terminateManager();
-
-
 
 
     }

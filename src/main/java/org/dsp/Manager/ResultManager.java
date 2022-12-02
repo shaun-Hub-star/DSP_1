@@ -1,7 +1,6 @@
 package org.dsp.Manager;
 
 import org.dsp.Pair;
-import org.dsp.Worker.WorkerResult;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +19,7 @@ public class ResultManager {//TODO main thread creates it in the beginning
     public void addResult(String bucketName, WorkerResult workerResult){
         Pair<Integer,List<WorkerResult>> value = this.resultByLocalApplication.get(bucketName);
         value.getSecond().add(workerResult);
+        System.out.println("result added"+ workerResult.toString());
     }
 
     public void deleteLocalBucketEntry(String bucketName){
@@ -27,11 +27,15 @@ public class ResultManager {//TODO main thread creates it in the beginning
     }
 
     public boolean didFinishRequest(String bucketName){//for workersResultThread
-        Pair<Integer,List<WorkerResult>> value =  this.resultByLocalApplication.get(bucketName);
+        Pair<Integer,List<WorkerResult>> value = this.resultByLocalApplication.get(bucketName);
         return value.getFirst() == value.getSecond().size();
     }
     public List<WorkerResult> getWorkerResults(String bucketNameOfLocal){
         return this.resultByLocalApplication.get(bucketNameOfLocal).getSecond();
+    }
+
+    public boolean isEmpty(){
+        return this.resultByLocalApplication.isEmpty();
     }
 
 }

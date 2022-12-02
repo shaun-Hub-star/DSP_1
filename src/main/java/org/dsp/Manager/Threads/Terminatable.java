@@ -2,6 +2,8 @@ package org.dsp.Manager.Threads;
 
 public interface Terminatable {
 
-    void terminate();
-    boolean terminated();
+    void terminateSystem();
+    void notifyTerminationMessageOccurred(); //occurred
+    boolean systemTerminated();
+    boolean receivedTerminationMessage();
 }
