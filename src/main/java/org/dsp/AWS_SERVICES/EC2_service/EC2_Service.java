@@ -1,5 +1,6 @@
 package org.dsp.AWS_SERVICES.EC2_service;
 
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
@@ -29,6 +30,7 @@ public class EC2_Service {
         this.region = region;
         ec2 = Ec2Client.builder()
                 .region(this.region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
 

@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: org.dsp.Local.LocalApplicationMain
+Main-Class: org.dsp.Worker.Worker
 

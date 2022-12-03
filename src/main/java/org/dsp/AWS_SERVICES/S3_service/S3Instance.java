@@ -33,6 +33,7 @@ public class S3Instance implements IS3_Methods {
     public S3Instance(Region region, String bucketName) {
         this.bucket = bucketName;
         this.s3 = S3Client.builder().
+                credentialsProvider(ProfileCredentialsProvider.create()).
                 region(region).build();
         /*this.s3 = S3Client.builder().
                 region(region).credentialsProvider(ProfileCredentialsProvider.create()).build();

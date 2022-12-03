@@ -15,12 +15,11 @@ public class Main {
         s3Jars.deleteBucketAndContent();
         s3Jars.createBucket();
         String managerJarKey = "ManagerJar";
-        String managerJarPath = "/home/spl-labs/Desktop/DSP_213/out/artifacts/ManagerEXE_jar/DSP_213.jar";
+        String managerJarPath = "out/artifacts/Local_jar/DSP_213.jar";
         s3Jars.uploadFile(managerJarKey, managerJarPath);
         String workerJarKey = "WorkerJar";
-        String workerJarPath = "/home/spl-labs/Desktop/DSP_213/out/artifacts/WorkerEXE_jar/DSP_213.jar";
+        String workerJarPath = "out/artifacts/Worker_jar/DSP_213.jar";
         s3Jars.uploadFile(workerJarKey, workerJarPath);
-
 
     }
 

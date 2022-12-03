@@ -57,7 +57,7 @@ public class LocalApplication {
                             "java -jar " + this.managerJarKey + ".jar " +
                             /*args:*/suffix + " " + managerExistsBucketName + " " + managerExistsFileKey + " " + ratioOfComputers + " " + terminationCode;
 
-            this.managerId = ec2_service.createEc2Instance(managerTag, managerScript, InstanceType.M4_LARGE);
+            this.managerId = ec2_service.createEc2Instance(managerTag, managerScript, InstanceType.M5_LARGE);
             createAndUploadManagerFile();
             System.out.println("[DEBUG] Manager created and started!.");
 
@@ -191,29 +191,29 @@ public class LocalApplication {
             startManager();
 
             sendTheLocationOfInputFileOnS3ForManager();
-            /*
+
             waitForResultFromManager();
             deleteResultSQS();
-            //String htmlBody = getHtmlBodyFromS3();
+            String htmlBody = getHtmlBodyFromS3();
             deleteLocalAppBucket();
-            //createHTML(htmlBody);
+            createHTML(htmlBody);
 
-             */
+
 
         } catch (Exception e){
-            /*
+
             deleteResultSQS();
             deleteLocalAppBucket();
 
-             */
+
             e.printStackTrace();
         }
         finally {
-            /*
+
             s3ManagerBucket.deleteBucketAndContent();
             ec2_service.terminateEC2(this.managerId);
 
-             */
+
         }
 
     }

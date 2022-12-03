@@ -127,11 +127,7 @@ public class MainThread {
         //updating number of workers
         numberOfWorkers -= notRunningWorkers.size();
 
-        int numberOfWorkersToAdd;
-        if (numberOfWorkers == 0)
-            numberOfWorkersToAdd = numberOfMessagesInProcess.get() / (numberLinksRequiredToNewInstance) + 1;
-        else
-            numberOfWorkersToAdd = numberOfMessagesInProcess.get() / (numberOfWorkers * numberLinksRequiredToNewInstance);
+        int numberOfWorkersToAdd = numberOfMessagesInProcess.get()/numberLinksRequiredToNewInstance - numberOfWorkers;
 
         return Math.min(maxNumberOfEc2Instances - numberOfWorkers, numberOfWorkersToAdd);
 
