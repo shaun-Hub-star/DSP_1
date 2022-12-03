@@ -27,6 +27,7 @@ public class GetLocalRequestsThread extends ActOnMessageThread {
         while (!systemTerminated()) {
             actOnMessage(localToManager.receiveMsg());
         }
+        localToManager.deleteQueue();
     }
 
     @Override

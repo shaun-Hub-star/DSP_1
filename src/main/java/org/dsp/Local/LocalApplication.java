@@ -30,8 +30,8 @@ public class LocalApplication {
     private SQSQueue localToManagerSQS;
     private final SQSQueue resultFromManager = new SQSQueue(s3Instance.getBucket(), this.region);
     private final int ratioOfComputers;
-
     private final String terminationCode = "terminate";
+    private final String credentialsKey = "credentials";
 
     public LocalApplication(String inputFilePath, String outputFilePath, int ratioOfComputers) {
         this.inputFilePath = inputFilePath;
@@ -51,6 +51,9 @@ public class LocalApplication {
                             "sudo yum update -y\n" +
                             "sudo amazon-linux-extras install java-openjdk11 -y\n" +
                             "sudo yum install java-devel -y\n" +
+                            "cd ~\n" +
+                            "mkdir .aws\n" +
+                            "aws s3 cp s3://" + s3Jars.getBucket() + "/" + this.credentialsKey + " ./.aws/" + this.credentialsKey + "\n" +
                             "mkdir ManagerFiles\n" +
                             "cd ManagerFiles\n" +
                             "aws s3 cp s3://" + s3Jars.getBucket() + "/" + this.managerJarKey + " " + this.managerJarKey + ".jar\n" +
@@ -122,16 +125,11 @@ public class LocalApplication {
     public void terminateManager() {
         //notify to other locals that the manager does not exist
         deleteManagerExistsBucket();
-
-        //send terminate message to the manager:
-
         sendTerminationMessageToManager();
-        //TODO: send a message to the manager to terminate all the workers.
-        //TODO: only terminate manager after cleaning his whole SQS queue.
-        //TODO: manager: close managerBucket in order of new request create a different manager.
+
         //TODO: close the SQS localToManager(manager_id)
         //TODO: create a suicide message from the manager after sending all the results. in case of in case of self suicide does not work
-        this.ec2_service.terminateEC2(this.managerId); //TODO???: move this line to the manager.
+        //this.ec2_service.terminateEC2(this.managerId); //TODO???: move this line to the manager.
     }
 
     private void sendTerminationMessageToManager() {
@@ -179,9 +177,11 @@ public class LocalApplication {
         this.s3Instance.deleteBucketAndContent();
     }
 
+
     /**
      * Runs this operation.
      */
+
 
 
 
@@ -201,19 +201,12 @@ public class LocalApplication {
 
 
         } catch (Exception e){
-
-            deleteResultSQS();
-            deleteLocalAppBucket();
-
-
+            localToManagerSQS.deleteQueue();
             e.printStackTrace();
         }
         finally {
-
-            s3ManagerBucket.deleteBucketAndContent();
-            ec2_service.terminateEC2(this.managerId);
-
-
+            deleteResultSQS();
+            deleteLocalAppBucket();
         }
 
     }

@@ -16,6 +16,8 @@ public class WorkersResultThread extends ActOnMessageThread {
 
     public WorkersResultThread(Region region, ExecutorService uploadAndSendThreadPool, SQSQueue workerToManager, AtomicInteger numberOfMessagesInProcess, ResultManager resultManager, AtomicBoolean systemTerminated, AtomicBoolean terminationMessageOccurred) {
         super(region, uploadAndSendThreadPool, workerToManager, numberOfMessagesInProcess, resultManager, systemTerminated, terminationMessageOccurred);
+        System.out.println("WorkersResultThread.WorkersResultThread");
+
     }
 
     @Override

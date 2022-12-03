@@ -39,7 +39,7 @@ public class SQSQueue implements ISQS_service {
                 .queueName(this.queueName)
                 .build();
         this.queueUrl = sqs.getQueueUrl(getQueueRequest).queueUrl();
-
+        System.out.println("getQueueRequest initialize= " + getQueueRequest);
 
     }
 
@@ -73,7 +73,9 @@ public class SQSQueue implements ISQS_service {
     }
 
     public SQSMessage receiveMsg() {
-        return receiveMessages(1).get(0);
+        SQSMessage receivedMessage = receiveMessages(1).get(0);
+        System.out.println("The received message is: " + receivedMessage);
+        return receivedMessage;
     }
 
     public List<SQSMessage> receiveMessages(){

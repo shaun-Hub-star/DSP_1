@@ -140,7 +140,7 @@ public class S3Instance implements IS3_Methods {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+         }
         if (!result.delete())
             System.out.println("Fail: failed to delete file locally: " + fileNameInS3 + "." + fileType);
         return bodyString;

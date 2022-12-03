@@ -12,16 +12,36 @@ public class Main {
         String jarsBucket = "jars" + suffix;
         Region region = Region.US_EAST_1;
         S3Instance s3Jars = new S3Instance(region, jarsBucket);
-        s3Jars.deleteBucketAndContent();
+        //s3Jars.deleteBucketAndContent();
+        //uploadManagerJar(s3Jars);
+        uploadWorkerJar(s3Jars);
+        //uploadCredentials(s3Jars);
+
+
+    }
+
+    private static void uploadManagerJar(S3Instance s3Jars){
         s3Jars.createBucket();
         String managerJarKey = "ManagerJar";
-        String managerJarPath = "out/artifacts/Local_jar/DSP_213.jar";
+        String managerJarPath = "out/artifacts/Manager_jar/DSP_213.jar";
         s3Jars.uploadFile(managerJarKey, managerJarPath);
+    }
+
+    private static void uploadWorkerJar(S3Instance s3Jars){
+        s3Jars.createBucket();
         String workerJarKey = "WorkerJar";
         String workerJarPath = "out/artifacts/Worker_jar/DSP_213.jar";
         s3Jars.uploadFile(workerJarKey, workerJarPath);
-
     }
+
+    private static void uploadCredentials(S3Instance s3Jars){
+        s3Jars.createBucket();
+        String credentialsKey = "credentials";
+        String credentialsPath = "/home/spl-labs/Desktop/credentials";
+        s3Jars.uploadFile(credentialsKey, credentialsPath);
+    }
+
+
 
     
 

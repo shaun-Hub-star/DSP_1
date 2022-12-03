@@ -2,6 +2,9 @@ package org.dsp.Manager;
 
 import org.dsp.messages.SQSMessage;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class WorkerResult {
     private final String imgLink;
     private final String ocrResult;
@@ -13,8 +16,18 @@ public class WorkerResult {
 
     public WorkerResult(SQSMessage sqsMessage){
         String[] split = sqsMessage.getBody().split("\n");
-        this.imgLink = split[0];
-        this.ocrResult = split[1];
+        if(split.length < 2){
+            this.imgLink = "error";
+            this.ocrResult = "error";
+        }
+        else{
+            this.imgLink = split[0];
+            StringBuilder body = new StringBuilder();
+            for(int i = 1; i < split.length; i++){
+                body.append(split[i]).append("\n");
+            }
+            this.ocrResult = body.substring(0, body.length() - 1);
+        }
     }
 
     public String getImgLink() {

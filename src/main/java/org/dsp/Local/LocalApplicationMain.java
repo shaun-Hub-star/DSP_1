@@ -23,7 +23,6 @@ public class LocalApplicationMain {
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
             throw e;
-
         }
 
         localApplication = new LocalApplication(inputFile, outputFile, ratioOfComputers);

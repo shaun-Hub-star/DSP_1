@@ -12,15 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class ActOnMessageThread implements Runnable, Terminatable {
     private final AtomicBoolean systemTerminated;
     private final AtomicBoolean terminatedMessageAccrued; //occurred
-
     protected final ExecutorService threadPool;
-
     protected final Region region;
     protected final SQSQueue sqsQueue;
     protected final AtomicInteger numberOfMessagesInProcess;
     protected final ResultManager resultManager;
 
     protected ActOnMessageThread(Region region, ExecutorService threadPool, SQSQueue sqsQueue, AtomicInteger numberOfMessagesInProcess, ResultManager resultManager, AtomicBoolean systemTerminated, AtomicBoolean terminatedMessageAccrued) {
+        System.out.println("ActOnMessageThread.ActOnMessageThread");
         this.threadPool = threadPool;
         this.region = region;
         this.sqsQueue = sqsQueue;

@@ -35,8 +35,8 @@ public class DownloadAndDistributeTask implements Runnable{
     @Override
     public void run() {
         List<SQSMessage> links = new LinkedList<>();
-        File imgLinksFile = s3LocalBucket.downloadFile(imgLinksFileKey, imgLinksFileKey + ".txt");
-        System.out.println("[Debug] downloaded file " + imgLinksFileKey + ".txt from s3");
+        File imgLinksFile = s3LocalBucket.downloadFile(imgLinksFileKey, imgLinksFileKey);
+        System.out.println("[Debug] downloaded file " + imgLinksFileKey + " from s3");
         int numberOfLinks = 0;
 
         try (FileReader fr = new FileReader(imgLinksFile)) {

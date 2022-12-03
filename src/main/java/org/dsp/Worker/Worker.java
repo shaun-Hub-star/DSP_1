@@ -22,6 +22,7 @@ public class Worker {
 
 
     public static void main(String[] args) {
+        System.out.println("[DEBUG]: Worker.main");
         String managerId = args[0];
         // Hello darling
         //setting workers sqs queues names
@@ -31,6 +32,7 @@ public class Worker {
         //setting workers sqs queues
         SQSQueue managerToWorkerSQS = new SQSQueue(managerToWorkerName, region);
         SQSQueue workerToManager = new SQSQueue(workerToManagerName, region);
+
 
         while (!terminated) {
             SQSMessage sqsMessage = managerToWorkerSQS.receiveMsg();
@@ -49,8 +51,8 @@ public class Worker {
 
     private static void run(SQSMessage bucketName_imgLink, SQSQueue workerToManager) {
 
-        String localBucket = bucketName_imgLink.getBody();
-        String imageLink = bucketName_imgLink.getRequestId();
+        String localBucket = bucketName_imgLink.getRequestId();
+        String imageLink = bucketName_imgLink.getBody();
 
         //download image
         try {
@@ -83,7 +85,9 @@ public class Worker {
     }
 
     private static File downloadImage(String link) throws IOException {
+        System.out.println("Downloading the image the image link is: " + link);
         URL url = new URL(link);
+        System.out.println("did not crash from URL in line 89 " + url);
         BufferedImage img;
         try {
             img = ImageIO.read(url);
