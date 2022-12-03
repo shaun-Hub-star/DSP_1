@@ -151,6 +151,8 @@ public class MainThread {
                         "sudo yum update -y\n" +
                         "sudo amazon-linux-extras install java-openjdk11 -y\n" +
                         "sudo yum install java-devel -y\n" +
+                        "sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm\n" +
+                        "sudo yum install tesseract" +
                         "cd ~\n" +
                         "mkdir .aws\n" +
                         "aws s3 cp s3://" + s3Jars.getBucket() + "/" + credentialsKey + " ./.aws/" + credentialsKey + "\n" +

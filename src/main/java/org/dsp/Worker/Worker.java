@@ -84,7 +84,8 @@ public class Worker {
         return new Pair<>(name, name.split("\\.")[1]);//if the time allows to do format checking because the ocr supports certain formats
     }
 
-    private static File downloadImage(String link) throws IOException {
+    //public for testing
+    public static File downloadImage(String link) throws IOException {
         System.out.println("Downloading the image the image link is: " + link);
         URL url = new URL(link);
         System.out.println("did not crash from URL in line 89 " + url);
@@ -101,9 +102,10 @@ public class Worker {
 
     }
 
-    private static String doOCR(File img) {
+    //public for testing
+    public static String doOCR(File img) {
         try {
-            ITesseract tesseract = new Tesseract();
+            Tesseract tesseract = new Tesseract();
             tesseract.setDatapath("src/main/resources/tessdata");
             return tesseract.doOCR(img);
         } catch (TesseractException e) {
