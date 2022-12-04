@@ -35,10 +35,14 @@ public abstract class ActOnMessageThread implements Runnable, Terminatable {
 
     public void terminateSystem(){
         this.systemTerminated.set(true);
+        synchronized (numberOfMessagesInProcess){
+            this.numberOfMessagesInProcess.notifyAll(); //notify the main thread.
+        }
     }
 
     public void notifyTerminationMessageOccurred(){
         this.terminatedMessageAccrued.set(true);
+
     }
 
     public boolean systemTerminated(){

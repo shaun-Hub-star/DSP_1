@@ -30,22 +30,25 @@ public class WorkersResultThread extends ActOnMessageThread {
     }
 
     @Override
-    protected void actOnMessage(SQSMessage resultMessage){
-        sqsQueue.deleteMessage(resultMessage);
-        numberOfMessagesInProcess.decrementAndGet();
-        String bucketNameOfLocalApp = resultMessage.getRequestId();
-        resultManager.addResult(bucketNameOfLocalApp, new WorkerResult(resultMessage));
+    protected void actOnMessage(SQSMessage resultMessage) {
+        if (!resultMessage.getRequestId().equals("terminate")) {
+            sqsQueue.deleteMessage(resultMessage);
+            numberOfMessagesInProcess.decrementAndGet();
+            String bucketNameOfLocalApp = resultMessage.getRequestId();
+            resultManager.addResult(bucketNameOfLocalApp, new WorkerResult(resultMessage));
 
-        if (resultManager.didFinishRequest(bucketNameOfLocalApp)) {
-            System.out.println("[Debug] finish working on local request " + bucketNameOfLocalApp);
-            Runnable uploadAndSend = new UploadAndSendTask(region, bucketNameOfLocalApp, resultManager.getWorkerResults(bucketNameOfLocalApp));
-            resultManager.deleteLocalBucketEntry(bucketNameOfLocalApp);
-            threadPool.execute(uploadAndSend); //threadPool = uploadAndSendThreadPool
+            if (resultManager.didFinishRequest(bucketNameOfLocalApp)) {
+                System.out.println("[Debug] finish working on local request " + bucketNameOfLocalApp);
+                Runnable uploadAndSend = new UploadAndSendTask(region, bucketNameOfLocalApp, resultManager.getWorkerResults(bucketNameOfLocalApp));
+                resultManager.deleteLocalBucketEntry(bucketNameOfLocalApp);
+                threadPool.execute(uploadAndSend); //threadPool = uploadAndSendThreadPool
+            }
         }
 
-        if(resultManager.isEmpty() && receivedTerminationMessage()) {//TODO: debug termination process
+        if (resultManager.isEmpty() && receivedTerminationMessage()) {//TODO: debug termination process
             System.out.println("[Debug] termination message occurred and and the resultManager is empty ");
             terminateSystem();
+
         }
     }
 

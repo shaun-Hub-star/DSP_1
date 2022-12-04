@@ -8,7 +8,7 @@ import java.io.*;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        String suffix = "525381648dqw4w9wgxcq";
+        String suffix = "0525381648dqw4w9wgxcq";
         String jarsBucket = "jars" + suffix;
         Region region = Region.US_EAST_1;
         S3Instance s3Jars = new S3Instance(region, jarsBucket);

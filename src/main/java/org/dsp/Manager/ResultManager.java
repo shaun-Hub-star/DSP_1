@@ -19,7 +19,6 @@ public class ResultManager {//TODO main thread creates it in the beginning
     public void addResult(String bucketName, WorkerResult workerResult){
         Pair<Integer,List<WorkerResult>> value = this.resultByLocalApplication.get(bucketName);
         value.getSecond().add(workerResult);
-        System.out.println("result added"+ workerResult.toString());
     }
 
     public void deleteLocalBucketEntry(String bucketName){

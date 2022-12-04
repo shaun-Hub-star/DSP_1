@@ -58,7 +58,7 @@ public class Worker {
         try {
             File imageFile = downloadImage(imageLink);
             if (imageFile == null) {
-                workerToManager.sendMessage(new SQSMessage(imageLink + "\nshould not be happening, could not write to a file", localBucket));
+                workerToManager.sendMessage(new SQSMessage(imageLink + "\nthe link provided was not a supported img type", localBucket));
                 return;
             }
             //performOCR
@@ -88,7 +88,6 @@ public class Worker {
     public static File downloadImage(String link) throws IOException {
         System.out.println("Downloading the image the image link is: " + link);
         URL url = new URL(link);
-        System.out.println("did not crash from URL in line 89 " + url);
         BufferedImage img;
         try {
             img = ImageIO.read(url);

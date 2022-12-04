@@ -56,20 +56,6 @@ public class SQSQueue implements ISQS_service {
     public void sendMultiMsg(List<SQSMessage> messages) {
         for(SQSMessage message : messages)
             sendMessage(message);
-
-         /*
-        List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntries = new ArrayList<>();
-        messages.forEach(msg -> sendMessageBatchRequestEntries.add(SendMessageBatchRequestEntry.builder()
-                .messageBody(msg.toString())
-                .id(msg.getRequestId())
-                .build()));
-
-        SendMessageBatchRequest send_batch_request = SendMessageBatchRequest.builder()
-                .queueUrl(queueUrl)
-                .entries(sendMessageBatchRequestEntries)
-                .build();
-        sqs.sendMessageBatch(send_batch_request);
-          */
     }
 
     public SQSMessage receiveMsg() {
@@ -86,7 +72,6 @@ public class SQSQueue implements ISQS_service {
         int timeInMinutes = 8;
         int waitTimeSecondsForEachIteration = 20;
         for(int i = 0; i < timeInMinutes * 60 / waitTimeSecondsForEachIteration; i++){
-
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .visibilityTimeout(80)

@@ -24,6 +24,7 @@ public class EC2_Service {
 
     private final Ec2Client ec2;
     private final String amiId = "ami-0b0dcb5067f052a63";
+//    private final String amiId = "";
     private Region region;
 
     public EC2_Service(Region region) {

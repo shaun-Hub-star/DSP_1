@@ -15,19 +15,28 @@ public class GetLocalRequestsThread extends ActOnMessageThread {
 
     private final SQSQueue localToManager;
     private final String terminationCode;
+    private final String workerToManagerName;
     public GetLocalRequestsThread(String managerId, Region region, ExecutorService downloadAndDistributeThreadPool, SQSQueue managerToWorker, AtomicInteger numberOfMessagesInProcess, ResultManager resultManager,
                                   String terminationCode, AtomicBoolean systemTerminated, AtomicBoolean terminationMessageOccurred) {
         super(region, downloadAndDistributeThreadPool, managerToWorker, numberOfMessagesInProcess, resultManager, systemTerminated, terminationMessageOccurred);
         this.localToManager = new SQSQueue(managerId, region);
         this.terminationCode = terminationCode;
+        this.workerToManagerName = managerId + "workerToManager";
+
     }
 
     @Override
     public void run() {
-        while (!systemTerminated()) {
+        //the last message is always the termination message
+        while (!receivedTerminationMessage()) {
             actOnMessage(localToManager.receiveMsg());
         }
+
         localToManager.deleteQueue();
+        // in case all the workers already finished their job,
+        // we want to notify the thread responsible to terminate the system,
+        // that we received a termination message
+        new SQSQueue(workerToManagerName, region).sendMessage(new SQSMessage("terminate", "terminate"));
     }
 
     @Override

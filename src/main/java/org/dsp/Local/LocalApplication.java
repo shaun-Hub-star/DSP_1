@@ -12,7 +12,7 @@ import java.io.*;
 public class LocalApplication {
 
 
-    private final String suffix = "525381648dqw4w9wgxcq";
+    private final String suffix = "0525381648dqw4w9wgxcq";
     private final String managerJarKey = "ManagerJar";
     private final String managerTag = "ManagerTag";
     private final String managerExistsBucketName = "managerexistsbucket"+suffix;
@@ -125,9 +125,8 @@ public class LocalApplication {
     public void terminateManager() {
         //notify to other locals that the manager does not exist
         deleteManagerExistsBucket();
-        sendTerminationMessageToManager();
+        sendTerminationMessageToManager(); //the termination message is sure to be the last message that the manager receives
 
-        //TODO: close the SQS localToManager(manager_id)
         //TODO: create a suicide message from the manager after sending all the results. in case of in case of self suicide does not work
         //this.ec2_service.terminateEC2(this.managerId); //TODO???: move this line to the manager.
     }
@@ -154,7 +153,7 @@ public class LocalApplication {
     }
 
     private String getHtmlBodyFromS3() {
-        return s3Instance.downloadFileContentFromS3("result", "txt", outputFilePath);
+        return s3Instance.downloadFileContentFromS3("results", "txt", outputFilePath);
     }
 
 
@@ -165,7 +164,7 @@ public class LocalApplication {
                 "<title>OCR</title>\n" +
                 "</head>\n" + htmlBody + "</html>";
 
-        try (FileWriter fw = new FileWriter(outputFilePath + "\\results.html")) {
+        try (FileWriter fw = new FileWriter(outputFilePath + "/results.html")) {
             fw.write(html);
 
         } catch (IOException e) {
@@ -199,7 +198,7 @@ public class LocalApplication {
 
         } catch (Exception e){
             localToManagerSQS.deleteQueue();
-            e.printStackTrace();
+            System.out.println(e.getMessage()+" "+ e.getMessage());
         }
 
     }

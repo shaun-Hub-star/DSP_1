@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainThread {
 
     private static final ResultManager resultManager = new ResultManager();
-    private static final int maxNumberOfEc2Instances = 2;//FIXME to 17
+    private static final int maxNumberOfEc2Instances = 17;
     private static int numberOfWorkers = 0;
     private static final AtomicInteger numberOfMessagesInProcess = new AtomicInteger(0);
     private static final Region region = Region.US_EAST_1;
@@ -95,7 +95,7 @@ public class MainThread {
         //handling workers
         while (!systemTerminated.get()) {
             synchronized (numberOfMessagesInProcess) {
-                while (getNumberOfWorkersToAdd() == 0) {
+                while (getNumberOfWorkersToAdd() == 0 && !systemTerminated.get()) {
                     try {
                         numberOfMessagesInProcess.wait();
                     } catch (InterruptedException ignore) {
@@ -113,22 +113,35 @@ public class MainThread {
         }
 
         //termination
+        System.out.println("[Debug] in termination");
+
+
+        System.out.println("[Debug] terminating all thread pools");
+        downloadAndDistributeThreadPool.shutdown();
+        uploadAndSendThreadPool.shutdown();
+
+        System.out.println("[Debug] terminating workers:");
         for (String workerId : workersIds) {
             ec2.terminateEC2(workerId);
-            downloadAndDistributeThreadPool.shutdown();
-            uploadAndSendThreadPool.shutdown();
+            System.out.println("[Debug] worker: " + workerId + " got terminated");
         }
 
+        System.out.println("[Debug] joining 'get local request thread' and 'get worker result thread' to the main thread");
         try {
             getLocalRequestsThread.join();
             workersResultThread.join();
-        } catch (InterruptedException ignore) {}
+            System.out.println("[Debug] after joining");
+
+        } catch (InterruptedException ignore) {
+        }
 
         //deleting the sqs queue from locals to this manager.
-        new SQSQueue(managerId, region).deleteQueue();
+        //new SQSQueue(managerId, region).deleteQueue();
 
         /*suicide*/
+        System.out.println("[Debug] about to suicide!");
         ec2.terminateEC2(managerId);
+        System.out.println("[Debug] after suicide...");
 
     }
 
@@ -140,7 +153,7 @@ public class MainThread {
         workersIds.removeAll(notRunningWorkers);
 
         //updating number of workers
-        numberOfWorkers -= notRunningWorkers.size();
+        numberOfWorkers = workersIds.size();
 
         int numberOfWorkersToAdd = numberOfMessagesInProcess.get() / numberLinksRequiredToNewInstance - numberOfWorkers;
 
@@ -167,7 +180,7 @@ public class MainThread {
                         "java -jar " + workerJarKey + ".jar " +
                         /*args:*/managerId;
 
-        String workerId = ec2.createEc2Instance(workerTag, workerScript, InstanceType.M5_LARGE);
+        String workerId = ec2.createEc2Instance(workerTag, workerScript, InstanceType.T2_MICRO);
         workersIds.add(workerId);
         numberOfWorkers++;
     }
