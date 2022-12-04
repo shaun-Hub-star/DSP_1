@@ -124,6 +124,9 @@ public class MainThread {
             workersResultThread.join();
         } catch (InterruptedException ignore) {}
 
+        //deleting the sqs queue from locals to this manager.
+        new SQSQueue(managerId, region).deleteQueue();
+
         /*suicide*/
         ec2.terminateEC2(managerId);
 
@@ -152,12 +155,14 @@ public class MainThread {
                         "sudo amazon-linux-extras install java-openjdk11 -y\n" +
                         "sudo yum install java-devel -y\n" +
                         "sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm\n" +
-                        "sudo yum install tesseract" +
+                        "sudo yum install tesseract -y\n" +
                         "cd ~\n" +
                         "mkdir .aws\n" +
                         "aws s3 cp s3://" + s3Jars.getBucket() + "/" + credentialsKey + " ./.aws/" + credentialsKey + "\n" +
                         "mkdir WorkerFiles\n" +
                         "cd WorkerFiles\n" +
+                        "mkdir tessdata\n" +
+                        "aws s3 cp s3://" + s3Jars.getBucket() + "/" + "eng.traineddata" + " ./tessdata/eng.traineddata\n" +
                         "aws s3 cp s3://" + s3Jars.getBucket() + "/" + workerJarKey + " " + workerJarKey + ".jar\n" +
                         "java -jar " + workerJarKey + ".jar " +
                         /*args:*/managerId;

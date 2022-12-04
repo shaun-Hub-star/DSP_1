@@ -106,7 +106,7 @@ public class Worker {
     public static String doOCR(File img) {
         try {
             Tesseract tesseract = new Tesseract();
-            tesseract.setDatapath("src/main/resources/tessdata");
+            tesseract.setDatapath(".");
             return tesseract.doOCR(img);
         } catch (TesseractException e) {
             return null;

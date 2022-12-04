@@ -38,8 +38,8 @@ public class WorkersResultThread extends ActOnMessageThread {
 
         if (resultManager.didFinishRequest(bucketNameOfLocalApp)) {
             System.out.println("[Debug] finish working on local request " + bucketNameOfLocalApp);
-            resultManager.deleteLocalBucketEntry(bucketNameOfLocalApp);
             Runnable uploadAndSend = new UploadAndSendTask(region, bucketNameOfLocalApp, resultManager.getWorkerResults(bucketNameOfLocalApp));
+            resultManager.deleteLocalBucketEntry(bucketNameOfLocalApp);
             threadPool.execute(uploadAndSend); //threadPool = uploadAndSendThreadPool
         }
 

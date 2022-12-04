@@ -12,7 +12,7 @@ import java.io.*;
 public class LocalApplication {
 
 
-    private final String suffix = "0525381648dqw4w9wgxcq";
+    private final String suffix = "525381648dqw4w9wgxcq";
     private final String managerJarKey = "ManagerJar";
     private final String managerTag = "ManagerTag";
     private final String managerExistsBucketName = "managerexistsbucket"+suffix;
@@ -189,24 +189,17 @@ public class LocalApplication {
         try{
             uploadImageURLsToS3();
             startManager();
-
             sendTheLocationOfInputFileOnS3ForManager();
-
             waitForResultFromManager();
-            deleteResultSQS();
             String htmlBody = getHtmlBodyFromS3();
-            deleteLocalAppBucket();
             createHTML(htmlBody);
 
-
+            deleteLocalAppBucket();
+            deleteResultSQS();
 
         } catch (Exception e){
             localToManagerSQS.deleteQueue();
             e.printStackTrace();
-        }
-        finally {
-            deleteResultSQS();
-            deleteLocalAppBucket();
         }
 
     }
